@@ -1,4 +1,7 @@
 {
   "redisHost": "192.168.0.1",
-  "redisProt": "7395"
+  "redisProt": "6379",
+  "accessToken": "",
+  "refreshToken": "",
+  "serviceProt": "22022"
 }
