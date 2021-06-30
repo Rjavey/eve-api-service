@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"log"
+	"eve-api-service/log"
 	"net/http"
 )
 import config "eve-api-service/conf"
@@ -9,11 +9,11 @@ import config "eve-api-service/conf"
 func init() {
 
 	http.HandleFunc("/hw", Helloworld)
-	var config = config.ApplicationConfig
+	var applicationConfig = config.ApplicationConfig
 
-	log.Printf("service is up on %v \n", config.ServiceProt)
-	err := http.ListenAndServe(":"+config.ServiceProt, nil)
+	log.Info.Printf("service is up on %v \n", applicationConfig.ServiceProt)
+	err := http.ListenAndServe(":"+applicationConfig.ServiceProt, nil)
 	if err != nil {
-		log.Fatal("service handle err at ListenAndServe: ", err)
+		log.Error.Printf("service handle err at ListenAndServe: ", err)
 	}
 }
