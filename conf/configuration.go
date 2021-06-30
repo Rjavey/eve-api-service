@@ -9,6 +9,7 @@ import (
 type Config struct {
 	RedisHost string
 	RedisProt string
+	RedisAuth string
 
 	AccessToken  string
 	RefreshToken string
@@ -26,4 +27,7 @@ func init() {
 	if err != nil {
 		log.Error.Printf("err was %v", err)
 	}
+
+	// init redis pool
+	connRedis(ApplicationConfig.RedisHost+":"+ApplicationConfig.RedisProt, ApplicationConfig.RedisAuth)
 }
