@@ -11,4 +11,8 @@ type TypeSearchParam struct {
 }
 
 type Order struct {
+	TypeId    string
+	TypeName  string
+	OrderType string
+	Area      string
 }

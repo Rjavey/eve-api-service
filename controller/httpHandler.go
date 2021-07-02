@@ -2,7 +2,6 @@ package controller
 
 import (
 	"eve-api-service/log"
-	"eve-api-service/service"
 	"net/http"
 )
 import config "eve-api-service/conf"
@@ -10,7 +9,7 @@ import config "eve-api-service/conf"
 func init() {
 
 	http.HandleFunc("/hw", Helloworld)
-	http.HandleFunc("/api/order/price", service.Search)
+	http.HandleFunc("/api/order/price", config.Search)
 
 	var applicationConfig = config.ApplicationConfig
 

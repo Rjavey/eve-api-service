@@ -30,4 +30,7 @@ func init() {
 
 	// init redis pool
 	connRedis(ApplicationConfig.RedisHost+":"+ApplicationConfig.RedisProt, ApplicationConfig.RedisAuth)
+
+	// init job
+	InitJob()
 }

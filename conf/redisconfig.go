@@ -4,6 +4,7 @@ import (
 	"eve-api-service/log"
 	"fmt"
 	redigo "github.com/gomodule/redigo/redis"
+	"reflect"
 	"time"
 )
 
@@ -84,6 +85,13 @@ func Exist(k string) bool {
 	return exist
 }
 
+func Incr(k string) {
+	_, err := RedisPool.Get().Do("INCR", k)
+	if err != nil {
+		fmt.Println("err while incr key:", err)
+	}
+}
+
 func Setnx(k string, v string) bool {
 	exist, err := redigo.Bool(RedisPool.Get().Do("SETNX", k, v))
 	if err != nil {
@@ -110,4 +118,50 @@ func Scan(k string) []string {
 		}
 	}
 	return keys
+}
+
+func Lpush(k string, v string) {
+	_, err := RedisPool.Get().Do("LPUSH", k, v)
+	if err != nil {
+		log.Error.Printf("redis lpush err:%v", err)
+	}
+}
+
+func Lrange(k string, s1 int64, s2 int64) []string {
+	vals, err := redigo.Values(RedisPool.Get().Do("RPUSH ", k, s1, s2))
+	if err != nil {
+		log.Error.Printf("redis rpush err:%v", err)
+	}
+
+	var res []string
+	for _, v := range vals {
+		if reflect.TypeOf(v).String() == "[]uint8" {
+			str := string(v.([]byte))
+			res = append(res, str)
+		}
+	}
+	return res
+}
+
+func Zset(k string, v string, score int64) {
+	_, err := RedisPool.Get().Do("ZADD", k, score, v)
+	if err != nil {
+		log.Error.Printf("redis zadd err:%v", err)
+	}
+}
+
+func ZrangeByScore(k string, s1 int64, s2 int64) []string {
+	vals, err := redigo.Values(RedisPool.Get().Do("zrange", k, s1, s2))
+	if err != nil {
+		log.Error.Printf("redis zadd err:%v", err)
+	}
+
+	var res []string
+	for _, v := range vals {
+		if reflect.TypeOf(v).String() == "[]uint8" {
+			str := string(v.([]byte))
+			res = append(res, str)
+		}
+	}
+	return res
 }

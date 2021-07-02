@@ -1,5 +1,5 @@
 {
-  "redisHost": "192.168.0.1",
+  "redisHost": "localhost",
   "redisProt": "6379",
   "accessToken": "",
   "refreshToken": "",

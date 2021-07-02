@@ -1,16 +1,21 @@
-package service
+package conf
 
 import (
 	"encoding/json"
-	redisUtil "eve-api-service/conf"
 	"eve-api-service/entry"
 	"eve-api-service/log"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"net/url"
 )
 
 const ORDER_PRE = "TypeOrder:"
-const JITA = "100001:"
+const JITA = "10000002:"
+const TYPE_HOT = "TypeHot:"
+
+const BASE_URL = "https://esi.evetech.net/latest"
+const ORDER = "/markets/%s/orders/"
 
 /**
 查询
@@ -33,16 +38,16 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	var orders []entry.TypeSearchResult
 	switch {
 	case len(param.TypeId) != 0:
-		result := redisUtil.Get(ORDER_PRE + JITA + param.TypeId)
+		result := Get(ORDER_PRE + JITA + param.TypeId)
 		if len(result) != 0 {
 			err = json.Unmarshal([]byte(result), &orders)
 		}
 		break
 	case len(param.TypeName) != 0:
 		// todo
-		keys := redisUtil.Scan(ORDER_PRE + JITA + param.TypeName)
+		keys := Scan(ORDER_PRE + JITA + param.TypeName)
 		for _, i := range keys {
-			result := redisUtil.Get(ORDER_PRE + JITA + i)
+			result := Get(ORDER_PRE + JITA + i)
 			if len(result) != 0 {
 				err = json.Unmarshal([]byte(result), &orders)
 			}
@@ -51,6 +56,12 @@ func Search(w http.ResponseWriter, r *http.Request) {
 	default:
 		fmt.Fprintf(w, "can't find any search param")
 	}
+
+	var order entry.Order
+
+	// 后续处理
+	Incr(TYPE_HOT + order.TypeId)
+
 	fmt.Fprintf(w, "todo")
 
 }
@@ -70,4 +81,18 @@ func isGet(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		log.Error.Printf("invalid_http_method:%v", r)
 	}
+}
+
+func FindOrder(id string, buy string, regin string) {
+	params := url.Values{}
+	str := fmt.Sprintf(BASE_URL+ORDER, regin)
+	Url, _ := url.Parse(str)
+	params.Set("order_type ", buy)
+	params.Set("type_id", id)
+	urlPath := Url.String()
+	//fmt.Println(urlPath)
+	resp, _ := http.Get(urlPath)
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(body))
 }
